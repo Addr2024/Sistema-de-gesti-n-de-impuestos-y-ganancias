@@ -1,0 +1,50 @@
+================================================================================
+PROMPT — FASE 2: PRUEBAS DE INTEGRACIÓN — FLUJO FISCAL
+Archivo: src/tests/fase2-integracion/flujoFiscal.integration.test.ts
+Ejecutar: pnpm vitest run src/tests/fase2-integracion/flujoFiscal.integration.test.ts
+================================================================================
+
+CONTEXTO:
+Eres un asistente de pruebas para el sistema Invergica Web.
+Esta prueba de integración verifica que VentasPanel y ImpuestosSection
+se comunican correctamente a través de taxStorage.ts.
+DFD Nivel 2: Proceso 1.1 (importar PDF) → 1.2 (extraer datos) → 2.2 (calcular impuestos)
+E-R: CIERRE_CAJA ←Detalla→ PRODUCTO ←Pertenece_A→ LOTE
+
+ESCENARIO DE PRUEBA — Semana de ventas Julio 2026:
+  Día 1: Bs. 12.500 ventas, Bs. 7.500 costo, Bs. 5.000 utilidad
+  Día 2: Bs. 9.800 ventas, Bs. 250 en divisas USD
+  Día 3: Bs. 15.200 ventas
+  Día 4: Bs. 8.400 ventas, Bs. 180 en divisas USD
+  Día 5: Bs. 11.000 ventas
+  Día 6: Bs. 13.700 ventas, Bs. 420 en divisas USD
+  Total divisas del mes: Bs. 850
+
+PRUEBAS DE INTEGRACIÓN REQUERIDAS:
+
+1. GUARDADO → LECTURA: Los 6 días almacenados se recuperan correctamente
+2. BASE IMPONIBLE: La suma de todos los días del mes es correcta
+3. IVA (PROCESO 2.2.2): IVA = baseImponible × 0.16
+4. DIVISAS: Solo los días con pago USD acumulan divisas
+5. IGTF (PROCESO 2.2.3): IGTF = divisas × 0.03
+6. TOTAL SENIAT: totalDeuda = IVA + IGTF
+7. UTILIDAD NETA: Se acumula correctamente del mes
+8. ÍNDICE: El mes aparece en mesesConDatos()
+
+PRUEBAS DE AISLAMIENTO:
+9. Actualizar divisas de un día NO modifica sus ventas totales
+10. Julio y Agosto son meses independientes (sin contaminación de datos)
+
+PRUEBAS DE VENCIMIENTO:
+11. vencimientoSENIAT("2026-07") === "2026-08-15"
+12. Mes 2020-03 tiene días de vencimiento negativos
+13. El mes del resumen coincide con el mes consultado
+
+PRUEBA DE PRECISIÓN:
+14. Base imponible con decimales (ej: Bs. 1234.56) no genera error de flotante
+15. IGTF de divisas decimales se redondea a 2 decimales
+
+HERRAMIENTAS: vitest, describe/it/expect/beforeEach
+DEPENDENCIAS: taxStorage.ts (única, no hay dependencias de componentes React)
+
+================================================================================

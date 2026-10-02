@@ -1,0 +1,52 @@
+================================================================================
+PROMPT — FASE 1: PRUEBAS UNITARIAS PARSER PDF (pdfParser.ts)
+Archivo: src/tests/fase1-unitarias/pdfParser.unit.test.ts
+Ejecutar: pnpm vitest run src/tests/fase1-unitarias/pdfParser.unit.test.ts
+================================================================================
+
+CONTEXTO:
+Eres un asistente de pruebas para el sistema Invergica Web.
+pdfParser.ts procesa los PDFs del sistema A2 (Cierre de Caja e Inventario).
+Las funciones puras NO necesitan el worker de PDF (se evita el mock complejo).
+Entidades E-R relacionadas:
+  PRODUCTO (id_producto, descripcion, stock_minimo)
+  LOTE (id_lote, vencimiento, color_alerta) — DFD 3.3.3 Asignar Color
+  CIERRE_CAJA (utilidad_neta) — resumenVentas
+
+FUNCIONES A PROBAR (puras, sin pdfjs):
+  - colorMargen(pct: number): "verde" | "amarillo" | "rojo"
+      Reglas: ≥60 → verde, ≥30 → amarillo, <30 → rojo
+  - estadoStock(p: ProductoInventario): "suficiente" | "bajo" | "agotado"
+      Reglas: existencia=0 → agotado, 0<existencia<stockMinimo → bajo, else → suficiente
+  - resumenVentas(prods: ProductoVendido[])
+      Retorna: totalVentas, totalCosto, totalUtilidad, margenPromedio, cantidad, mejores, peores
+  - resumenInventario(prods: ProductoInventario[])
+      Retorna: total, agotados, bajos, suficientes, listaAgotados, listaBajos, valorCosto, valorVenta
+
+CASOS DE BORDE CRÍTICOS:
+  colorMargen:
+    - exactamente 60 → verde (no amarillo)
+    - exactamente 30 → amarillo (no rojo)
+    - 59.9 → amarillo
+    - 29.9 → rojo
+
+  estadoStock:
+    - existencia === stockMinimo → suficiente (no bajo)
+    - existencia = 1, stockMinimo = 5 → bajo
+    - existencia = 0, stockMinimo = 0 → agotado
+
+  resumenVentas:
+    - lista vacía → margenPromedio=0, totalVentas=0 (sin división por cero)
+    - mejores son los 3 con mayor pctUtilidad (ordenados descendente)
+    - peores son los 3 con menor pctUtilidad (ordenados ascendente)
+    - margenPromedio = (totalUtilidad / totalVentas) × 100
+
+  resumenInventario:
+    - agotados + bajos + suficientes === total
+    - valorCosto = sum(existencia × costo) — productos agotados aportan 0
+    - lista vacía → todo en 0
+
+MOCK REQUERIDO: pdfjs-dist no se usa en estos tests (funciones puras)
+NOTA: Agregar en setup.ts: global.DOMMatrix = class {} para que pdfjs importe sin error
+
+================================================================================
