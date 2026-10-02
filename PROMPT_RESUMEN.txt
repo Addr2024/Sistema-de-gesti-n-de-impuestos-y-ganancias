@@ -1,0 +1,232 @@
+================================================================================
+PROMPT RESUMEN COMPLETO — PROYECTO INVERGICA
+Sistema Integrado de Gestión para Abasto (SIG-A)
+Fecha: Julio 2026
+================================================================================
+
+Este documento resume todo lo que se ha construido hasta ahora en este proyecto,
+tanto el sistema de escritorio Python (SIGA) como la interfaz web React (Invergica).
+Úsalo como punto de partida para continuar el desarrollo en una nueva sesión.
+
+================================================================================
+PARTE 1 — SISTEMA SIGA (Python Desktop)
+================================================================================
+
+Eres un desarrollador experto en Python. El sistema SIGA (Sistema Integral de
+Gestión de Impuestos y Ganancias) es una aplicación de escritorio para un abasto
+(tienda de víveres) en Maracaibo, Venezuela. Usa CustomTkinter, Pandas, Matplotlib
+y MySQL. Tiene dos módulos: Punto de Venta (POS) y Dashboard Gerencial.
+
+ARCHIVOS CREADOS EN /workspaces/default/code/siga/:
+
+1. schema.sql
+   - Base de datos MySQL: siga_db
+   - Tablas: productos, tasas_historicas, ventas, ventas_detalle,
+             gastos_operativos, cierres_fiscales
+   - Datos semilla incluidos (10 productos, 7 tasas BCV, 11 ventas de ejemplo)
+
+2. config.py
+   - IVA_RATE = 0.16
+   - IGTF_RATE = 0.03
+   - Paleta de colores dark blue-gray para CustomTkinter
+   - DB_CONFIG para conexión MySQL local
+   - Constantes de semáforo: STOCK_SUFICIENTE, STOCK_BAJO, STOCK_AGOTADO
+
+3. database.py
+   - Clase DatabaseManager con context manager cursor
+   - Métodos: get_product_by_code, save_sale (transacción), get_weekly_sales_by_day,
+     save_fiscal_closure, get_all_products, get_daily_sales,
+     get_total_expenses_day, fecha_tiene_cierre
+
+4. data_processor.py
+   - CartProcessor: carrito como DataFrame Pandas, cálculos vectorizados
+     de IVA/IGTF, totales fiscales
+   - DashboardProcessor: métricas diarias, tendencia semanal, gastos por
+     categoría (pie chart), inventario con semáforo, cierre fiscal
+
+5. app.py
+   - SIGAApp(ctk.CTk) con dos tabs: POSTab y DashboardTab
+   - Matplotlib embebido via FigureCanvasTkAgg
+   - Tema dark con paleta azul-gris oscuro
+
+6. requirements.txt
+   - customtkinter>=5.2.2, mysql-connector-python>=8.3.0,
+     pandas>=2.2.0, matplotlib>=3.8.0, numpy>=1.26.0
+
+================================================================================
+PARTE 2 — INTERFAZ WEB INVERGICA (React + TypeScript + Tailwind CSS v4)
+================================================================================
+
+Eres un desarrollador experto en React 18 + TypeScript + Tailwind CSS v4.
+El entorno es Figma Make (Vite). No hay backend; se usa localStorage para
+persistencia. La tienda se llama "Invergica", un abasto en Maracaibo, Venezuela.
+
+PALETA DE COLORES:
+  Fondo principal: #0d0300 (negro cálido muy oscuro)
+  Fondo card:      #1a0500 (marrón muy oscuro)
+  Borde primario:  #e07b00 (naranja)
+  Acento naranja:  #f5a623 (naranja claro)
+  Rojo oscuro:     #cc2200
+  Verde éxito:     #22c55e / #4ade80
+  Amarillo:        #eab308 / #facc15
+  Rojo alerta:     #ef4444 / #f87171
+  Morado IGTF:     #c084fc
+
+DATOS DEL NEGOCIO:
+  Nombre: Invergica
+  WhatsApp: +58 414-1667535 → https://wa.me/584141667535
+  Dirección: Av. 13, Entre calles 67 y 67A, C.67, Maracaibo 4001, Zulia
+  Google Maps: https://maps.app.goo.gl/sD1p8J5QZaA3dtvs7
+  Horario: Lun–Sáb 8am–7pm / Domingo: Cerrado
+  Correo admin: addr43342@gmail.com (en LoginPage.tsx)
+  Contraseña admin: Invergica2026 (en LoginPage.tsx)
+  IVA Venezuela: 16%
+  IGTF Venezuela: 3% sobre divisas
+
+IMÁGENES (todas en src/imports/):
+  Logo.jpg              — logo circular del negocio
+  Abasto.jpg            — foto fachada exterior
+  Interior_del_Abasto.jpg — foto interior del local
+
+ESTRUCTURA DE ARCHIVOS React:
+
+src/app/App.tsx
+  - Controla autenticación: useState isLoggedIn desde localStorage["invergica_auth"]
+  - Si !isLoggedIn → renderiza <LoginPage onLogin={...} />
+  - Si isLoggedIn → renderiza sitio completo: Navbar, HeroSection, stats band,
+    GallerySection, DocumentsSection, ImpuestosSection, ContactSection, Footer
+
+src/app/components/LoginPage.tsx
+  - ADMIN_EMAIL y ADMIN_PASSWORD como constantes editables al inicio del archivo
+  - Formulario: campo email (sin placeholder, validación visual con checkmark verde),
+    campo contraseña (sin placeholder, toggle mostrar/ocultar)
+  - Modal "Olvidé contraseña": abre con botón WhatsApp del admin
+  - Modal "No tengo cuenta": mensaje de sistema privado
+  - Sesión guardada en localStorage["invergica_auth"] = "true"
+
+src/app/components/Navbar.tsx
+  - Logo.jpg + "INVERGICA" + "TU MULTITIENDA FAVORITA"
+  - Links: Inicio, Galería, Documentos, Impuestos, Contacto
+  - Botón WhatsApp verde
+  - Botón "Salir" (onLogout prop) — solo visible cuando se pasa la prop
+
+src/app/components/HeroSection.tsx
+  - Abasto.jpg como fondo hero
+  - Badge "● ABASTO", título "Invergica / tu multitienda / favorita"
+  - Botón WhatsApp
+
+src/app/components/GallerySection.tsx
+  - Abasto.jpg (exterior) + Interior_del_Abasto.jpg (interior) en altura 340px
+  - 3 feature cards: Víveres en General, Horario Lun–Sáb 8am–7pm, Maracaibo Venezuela
+
+src/app/components/DocumentsSection.tsx
+  - Grid 2 columnas: VentasPanel + InventarioPanel
+
+src/app/components/VentasPanel.tsx
+  - FileDropZone para PDF del sistema A2 (reporte de ventas del día)
+  - Llama leerVentasPdf() → extrae ProductoVendido[]
+  - Al cargar PDF exitosamente:
+    * Llama guardarVentasDia() → guarda en localStorage para ImpuestosSection
+    * Muestra badge verde "Datos guardados para Pago de Impuestos del mes"
+  - Muestra: semáforo circular, 4 métricas (vendido/utilidad/costo/productos)
+  - Gráfica recharts BarChart con Cell por color de margen (top 20 productos)
+  - Tabla detalle completa con tags de semáforo
+  - Top 3 mejor/peor margen
+
+src/app/components/InventarioPanel.tsx
+  - FileDropZone para PDF del sistema A2 (reporte de existencias)
+  - Semáforo OCULTO hasta cargar PDF (dark placeholder)
+  - Cuando cargado: 3 contadores (suficiente/bajo/agotado), tabla de productos,
+    alertas urgentes para agotados y bajos
+
+src/app/components/FileDropZone.tsx
+  - Componente reutilizable drag & drop
+  - Estados: idle / dragging / loading / success / error
+  - Props: onFile, loading, fileName, error, accentColor, label
+
+src/app/components/ImpuestosSection.tsx (NUEVO — Módulo 2.0 DFD)
+  - Selector de mes (dropdown)
+  - Si sin datos: banner explicativo con instrucciones
+  - Si con datos:
+    * VencimientoBadge: días para vencimiento SENIAT (15 del mes siguiente)
+    * 4 tarjetas: Base Imponible / IVA (×0.16) / IGTF (×0.03) / Total SENIAT
+    * Resumen financiero o FlujoDFD visual (toggle)
+    * Box informativo sobre cómo registrar IGTF
+    * TablaDias: tabla editable donde el admin puede escribir el monto de divisas
+      de cada día (clic en celda para editar)
+    * Pasos para declarar ante SENIAT con los montos calculados
+
+src/app/components/ContactSection.tsx
+  - WhatsApp wa.me/584141667535
+  - Dirección Av. 13, Entre calles 67 y 67A, Maracaibo 4001, Zulia
+  - Horario Lun–Sáb 8am–7pm / Dom: Cerrado
+  - Botón Google Maps → https://maps.app.goo.gl/sD1p8J5QZaA3dtvs7
+  - Sin email
+
+src/app/components/Footer.tsx
+  - Logo.jpg, WhatsApp, horario, tagline "Tu multitienda de confianza en Maracaibo"
+
+UTILIDADES:
+
+src/app/utils/pdfParser.ts
+  - Usa pdfjs-dist@6.1.200, worker via CDN
+  - leerVentasPdf(file) → ProductoVendido[]
+  - leerInventarioPdf(file) → ProductoInventario[]
+  - Reconstrucción de tablas: extractItems → groupByRows (Y ±4px) → parseVentasRows/parseInventarioRows
+  - Detecta códigos de 5-6 dígitos como inicio de fila
+  - colorMargen(pct): ≥60 verde, ≥30 amarillo, rojo
+  - estadoStock(p): suficiente / bajo / agotado
+  - resumenVentas(prods), resumenInventario(prods)
+
+src/app/utils/taxStorage.ts (NUEVO)
+  - Implementa D1 (almacén fiscal) del DFD para la capa web
+  - Clave localStorage: "invergica_ventas_YYYY-MM-DD"
+  - guardarVentasDia(fecha, totalVentas, totalCosto, totalUtilidad, cantidad)
+  - actualizarDivisas(fecha, divisas): el admin ingresa manualmente los montos en USD
+  - calcularResumenMes(mes): suma todo el mes, calcula IVA=base×0.16 y IGTF=divisas×0.03
+  - IVA_RATE = 0.16, IGTF_RATE = 0.03 (constantes del DFD Nivel 3)
+  - vencimientoSENIAT(mes): día 15 del mes siguiente
+  - diasParaVencimiento(mes): días enteros hasta vencer
+
+DATOS DE MUESTRA (archivos de referencia, ya no usados activamente):
+  src/app/data/ventas_muestra.ts — 24 productos del reporte A2 real
+  src/app/data/inventario_muestra.ts — 29 productos de inventario
+
+DFD ADJUNTOS (en src/imports/):
+  DFD_Nivel_0.drawio.png — Diagrama de contexto: Admin ↔ SIGA ↔ SENIAT/Proveedores/Inventario
+  DFD_Nivel_1.drawio.png — 4 módulos: Ventas/Cierres, Tributaria, Inventario, Análisis
+  DFD_Nivel_2.drawio.png — Subprocesos: 1.1 Importar PDF, 1.2 Extraer, 2.1-2.3 Fiscal, 3.1-3.3 Inventario
+  DFD_Nivel_3.drawio.png — Explosión Módulo 4 Fiscal:
+    2.2.1 Extraer Base Imponible → 2.2.2 ×0.16 IVA → SENIAT
+                                → 2.2.3 Divisas ×0.03 IGTF → SENIAT
+    + Explosión 3.3 Semáforo Vencimientos: Leer Fecha → Restar vs Hoy → Asignar Color
+
+PAQUETES NPM INSTALADOS:
+  pdfjs-dist@6.1.200  — lectura de PDFs en el navegador
+  recharts@2.15.2     — gráficas de barras
+
+================================================================================
+ESTADO ACTUAL DEL PROYECTO (Julio 2026)
+================================================================================
+
+COMPLETADO:
+  ✓ Login con email + contraseña hardcodeados, sesión localStorage, modales
+  ✓ Navbar con logout
+  ✓ Hero, Galería, Contacto, Footer con datos reales de Invergica
+  ✓ VentasPanel: lector PDF A2, gráfica barras recharts, semáforo, tabla
+  ✓ InventarioPanel: lector PDF A2, semáforo condicional, alertas
+  ✓ ImpuestosSection: IVA+IGTF acumulado mensual, tabla editable de divisas,
+    badge de vencimiento SENIAT, flujo DFD visual, instrucciones de declaración
+  ✓ taxStorage.ts: persistencia fiscal en localStorage
+
+POSIBLES PRÓXIMOS PASOS:
+  - Conectar a Supabase para reemplazar localStorage con base de datos real
+  - Exportar reporte de impuestos a PDF desde el navegador (html2pdf o similar)
+  - Agregar sección de cuentas por pagar a proveedores (proceso 2.2 DFD Nivel 2)
+  - Panel de análisis estratégico (Módulo 4.0 DFD Nivel 1)
+  - Historial de declaraciones anteriores
+  - Configuración de perfil del administrador (cambiar correo/contraseña desde UI)
+
+================================================================================
+FIN DEL PROMPT RESUMEN
+================================================================================
