@@ -1,0 +1,83 @@
+Actúa como Diseñador UI/UX Senior especializado en Sistemas ERP/POS, Portales Administrativos, Paneles Fiscales e Inventarios Avanzados.
+
+Necesito diseñar en Figma la Arquitectura de Interfaz Completa (Fases 1, 2, 3 y 4) para el sistema "SIG-A (Invergica Web)", un sistema integrado de gestión diseñado para el dueño/administrador de un abasto. El diseño debe cubrir desde la autenticación básica hasta las funciones avanzadas de mantenimiento fiscal, semáforos duales, mermas, pruebas alfa y exportación de reportes.
+
+---
+
+### 🎨 1. SISTEMA VISUAL Y GUIAS GLOBALES (DESIGN SYSTEM)
+
+- Colores Corporativos:
+  - Primario: Naranja (#F97316) para áreas de carga/drag & drop y acciones principales de ventas.
+  - Secundario: Azul (#2563EB) para acciones de exportación y reportes.
+  - Éxito/Soporte: Verde Esmeralda (#059669 / #25D366) para WhatsApp y declaraciones listas.
+  - Fondo de Aplicación: Gris neutro claro (#F8FAFC) con tarjetas blancas elevated (#FFFFFF).
+- Sistema de Semáforos Duales (Badges & Indicadores):
+  - Semáforo 1 — Stock de Inventario:
+    - Verde: Suficiente (Existencia > Stock Mínimo)
+    - Amarillo: Bajo Stock (0 < Existencia ≤ Stock Mínimo)
+    - Rojo: Agotado (Existencia = 0)
+  - Semáforo 2 — Vencimiento de Lotes (DFD 3.3.3):
+    - Verde: En buen estado (> 30 días)
+    - Amarillo: Próximo a vencer (1 a 30 días)
+    - Rojo: Vencido o vence hoy (≤ 0 días)
+- Tipografía y Spacing: Jerarquía clara (Headings semibold, Body regular, Monospaced para códigos de lote y montos monetarios). Grid de 8px y Auto-Layout obligatorio en todos los componentes.
+
+---
+
+### 📱 2. PANTALLAS Y MÓDULOS DEL SISTEMA (FASE 1 A FASE 4)
+
+#### MÓDULO A: Autenticación y Acceso Seguro (Fases 1 y 3)
+- Pantalla de Login: Formulario limpio con campos de Email y Contraseña.
+- Modal "¿Olvidaste tu contraseña?": Popup centrado con icono de soporte y botón "Contactar Soporte por WhatsApp" (`wa.me`).
+- Toast/Tooltip "¿No tienes cuenta?": Mensaje informativo flotante "Sistema de uso privado y exclusivo de Invergica".
+- Header / Topbar: Logotipo de SIG-A, indicador del usuario activo y botón "Salir" (Logout).
+
+#### MÓDULO B: Procesamiento de Ventas y Gráficas de Rendimiento (Fases 1, 2 y 3)
+- Dropzone Naranja Drag & Drop: Zona de suelta de archivos PDF de ventas con estados (Normal, Hover/Active, Cargando con Spinner, Éxito y Error al subir PDF no válido).
+- Semáforo Circular de Rendimiento: Gauge visual que indica el rendimiento según el margen alcanzado.
+- Gráfica de Barras Interactivas: Ventas por producto con estado Hover (Tooltip con detalle de unidades y monto).
+- Badge Poscarga: Banner verde "Datos guardados para Pago de Impuestos".
+
+#### MÓDULO C: Control de Inventario, Lotes y Registro de Mermas (Fases 1, 2 y 4)
+- Header de Valorización: Métricas comparativas de Valor Total a Costo vs. Valor Total a Venta.
+- Tarjetas de Resumen: Métricas de Total Ítems, Suficientes, Bajos y Agotados.
+- Tabla de Lotes y Vencimientos:
+  - Columnas: Código de Lote (`LOTE-101`), Producto, Cantidad, Fecha Vencimiento, Días Restantes y Badge de Semáforo (Verde/Amarillo/Rojo).
+  - Filtro por estado de vencimiento: "Todos", "Próximos a Vencer (≤30 días)", "Vencidos".
+- Modal de Gestión de Mermas (E-R LOTE → MERMA):
+  - Formulario para registrar mermas asociadas a un lote.
+  - Campos: Cantidad mermada, Selector de Motivo ("Vencimiento", "Daño Físico", "Robo", "Otro").
+  - Historial/Desglose acumulado de mermas por lote.
+
+#### MÓDULO D: Gestión Fiscal SENIAT, Divisas e Historial (Fases 1, 2, 3 y 4)
+- Selector de Período Fiscal: Dropdown para cambiar de mes (ej. "Julio 2026", "Agosto 2026") y Estado Vacío ("Empty State") con ilustración explicativa si no hay datos.
+- Cards de Métricas Fiscales: Base Imponible, Débito IVA (16%), Acumulado Divisas USD e IGTF (3%).
+- Tabla Fiscal Interactiva:
+  - Celda editable de "Divisas": Input en línea que recalcula el IGTF de forma dinámica en tiempo real.
+- Widget Alerta SENIAT: Card con badge de días restantes para la declaración (Día 15 del mes siguiente).
+- Botones de Acción Fiscal (Fase 4):
+  - `[Exportar para SENIAT (PDF)]`: Botón azul que genera la vista previa de impresión del comprobante fiscal.
+  - `[Marcar como Declarado]`: Botón verde que guarda la declaración en el historial.
+- Tabla "Historial de Declaraciones Pasadas":
+  - Muestra mes, montos pagados, fecha de registro y Badge de Estado ("DECLARADO" / "PENDIENTE").
+
+#### MÓDULO E: Configuración Adaptativa y Registro de Sistema (Fase 4)
+- Panel de Parámetros Fiscales: Inputs para editar las tasas de ley (Tasa IVA % e IGTF %).
+- Drawer / Modal "Historial de Mantenimiento": Registro de parches del sistema (Mantenimiento Correctivo, Perfectivo y Adaptativo) mostrando estatus de salud (`103/103 Tests Passed`).
+
+#### MÓDULO F: Usabilidad, Soporte y Navegación Móvil (Fase 3)
+- Navbar Principal: Enlaces de sección con desplazamiento suave (Smooth Scroll).
+- Botón Flotante de WhatsApp: Botón verde fijado en la esquina inferior derecha.
+- Botón/Enlace "Ver en Google Maps": Redirección a la ubicación física del negocio.
+- Modal de Reporte de Fallos Alfa: Formulario de incidencias para el usuario ("ID de Test", "Módulo", "Pasos", "Resultado Obtenido") con botón para enviar por WhatsApp.
+- Layout Responsivo Móvil (375px): Adaptación de tablas, tarjetas apiladas y menú hamburguesa.
+
+---
+
+### 📦 3. ENTREGABLES REQUERIDOS EN FIGMA
+
+1. UI Kit Completo: Átomos, moléculas, botones de exportación, badges semáforo duales, celdas editables, modales y tooltips.
+2. Layouts Responsivos: Pantallas completas en Desktop (1440px) y Móvil (375px).
+3. Figma Prototype (Flujo Interactivo Continuo):
+   - Login → Carga Drag & Drop PDF Ventas → Edición Celda Divisas en Impuestos → Registro de Merma por Lote → Marcar Declaración Fiscal → Exportar Reporte a PDF.
+Nota: Dime como funciona todo, como ejecutarlo y como provarlo y en que carpectas estan las funciones. Adaptalo a lo que ya esta echo en el lenguaje Python con la librerias que ya estan en uso.
