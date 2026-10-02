@@ -1,3 +1,5 @@
+Sistema de gestión de impuestos y ganancias.
+
 # Invergica – SIGA + Sitio Web
 
 Dos sistemas paralelos para el abasto **Invergica** (Maracaibo, Zulia):
