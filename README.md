@@ -1,1 +1,1 @@
-# Sistema-de-gesti-n-de-impuestos-y-ganancias
+# Sistema-de-gestión-de-impuestos-y-ganancias
