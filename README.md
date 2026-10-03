@@ -2,10 +2,14 @@ Sistema de gestión de impuestos y ganancias.
 
 # Invergica – SIGA + Sitio Web
 
-Dos sistemas paralelos para el abasto **Invergica** (Maracaibo, Zulia):
+Sistema de gestión de impuestos y ganancias para el abasto **Invergica**
+(Maracaibo, Zulia). El proyecto se compone de dos sistemas paralelos:
 
-- **SIGA**: aplicación de escritorio en Python para gestión de impuestos, ganancias, punto de venta, lotes y mermas.
-- **Sitio web**: aplicación React/TypeScript con la presentación pública del negocio, login con sesión persistente, lectura de PDFs del sistema A2 y control fiscal.
+- **SIGA**: aplicación de escritorio en Python para gestión de impuestos,
+  ganancias, punto de venta, lotes y mermas (base de datos MySQL).
+- **Sitio web**: aplicación React/TypeScript con la presentación pública del
+  negocio, login con sesión persistente, lectura de PDFs del sistema A2 y
+  control fiscal.
 
 ## Problema o necesidad que aborda
 
@@ -44,76 +48,6 @@ Dos sistemas paralelos para el abasto **Invergica** (Maracaibo, Zulia):
 - Semáforo de rendimiento por inventario (`SemaforoRendimiento.tsx`)
 - Pago de Impuestos (`ImpuestosSection.tsx`), con datos acumulados en `localStorage` mediante `taxStorage.ts`
 
-## Estructura del proyecto: dónde está cada cosa
-
-```
-.
-├── README.md
-├── package.json                  # Dependencias y scripts de la web (build, test)
-├── vite.config.ts                # Configuración de Vite
-├── vitest.config.ts              # Configuración de pruebas web
-├── postcss.config.mjs
-│
-├── src/                          # ── SITIO WEB (React + TypeScript) ──
-│   ├── app/
-│   │   ├── App.tsx               # Raíz: controla sesión (login) y secciones
-│   │   ├── components/
-│   │   │   ├── LoginPage.tsx           # Acceso y sesión persistente
-│   │   │   ├── Navbar.tsx
-│   │   │   ├── HeroSection.tsx
-│   │   │   ├── ProductsSection.tsx
-│   │   │   ├── GallerySection.tsx
-│   │   │   ├── DocumentsSection.tsx
-│   │   │   ├── ContactSection.tsx      # WhatsApp, dirección, horario
-│   │   │   ├── Footer.tsx
-│   │   │   ├── VentasPanel.tsx         # Lectura de PDF de ventas A2
-│   │   │   ├── InventarioPanel.tsx     # Lectura de PDF de inventario A2
-│   │   │   ├── SemaforoRendimiento.tsx # Semáforo por inventario
-│   │   │   ├── ImpuestosSection.tsx    # Pago de impuestos
-│   │   │   ├── FileDropZone.tsx / PdfZone.tsx / ImageZone.tsx  # Zonas de arrastre
-│   │   │   ├── figma/ImageWithFallback.tsx
-│   │   │   └── ui/                     # Componentes base (shadcn/Radix)
-│   │   ├── utils/
-│   │   │   ├── pdfParser.ts            # Parseo de PDFs del sistema A2
-│   │   │   └── taxStorage.ts           # Persistencia fiscal en localStorage
-│   │   └── data/
-│   │       ├── ventas_muestra.ts       # Datos de ejemplo
-│   │       └── inventario_muestra.ts
-│   ├── imports/                  # Imágenes reales (Logo.jpg, Abasto.jpg,
-│   │                             #   Interior_del_Abasto.jpg) y Prompt_Maestro.txt
-│   ├── styles/                   # theme.css, fonts.css, tailwind.css, index.css
-│   └── tests/                    # Pruebas Vitest (103) por fase
-│       ├── setup.ts
-│       ├── fase1-unitarias/      # autenticacion, pdfParser, taxStorage
-│       ├── fase2-integracion/    # flujoFiscal, semaforoInventario
-│       └── fase3-aceptacion/     # checklist-alfa.md
-│
-├── siga/                         # ── SISTEMA DE ESCRITORIO (Python) ──
-│   ├── app.py                    # Ventana principal: POS y dashboard (punto de entrada)
-│   ├── login.py                  # Ventana de login
-│   ├── config.py                 # Constantes y credenciales de administrador
-│   ├── database.py               # Conexión y consultas MySQL
-│   ├── data_processor.py         # CartProcessor y DashboardProcessor (Pandas)
-│   ├── schema.sql                # Creación de las tablas MySQL
-│   ├── requirements.txt          # Dependencias Python
-│   └── tests/                    # Pruebas unitarias (77)
-│       ├── mock_deps.py
-│       ├── test_config.py
-│       ├── test_database.py
-│       └── test_login.py
-│
-├── guidelines/Guidelines.md      # Lineamientos de diseño
-├── PROMPTS_PRUEBAS/              # Prompts por fase de prueba (F1 a F4)
-│
-├── INFORME_SISTEMA.md            # Carpetas, archivos y funciones por interfaz (web)
-├── INFORME_CAMBIOS_PYTHON.md     # Cambios realizados en SIGA
-├── PLAN_PRUEBAS_INVERGICA.md     # Plan de pruebas
-├── PROMPT_RESUMEN.txt            # Resumen del proyecto
-└── ATTRIBUTIONS.md               # Créditos
-```
-
-> Los DFDs, Diagrama E-R, diccionarios y minutas están en: Sistema de gestión de impuestos y ganancias/src/imports
-
 ## Tecnologías utilizadas
 
 | Sistema | Stack |
@@ -123,21 +57,29 @@ Dos sistemas paralelos para el abasto **Invergica** (Maracaibo, Zulia):
 
 ## Base de datos
 
-- Motor: **MySQL**, usado solo por SIGA. La web no usa servidor y guarda sus datos en `localStorage`.
+- Motor: **MySQL**, usado por SIGA. La web no usa servidor y guarda sus datos en `localStorage`.
 - Script de creación: [`siga/schema.sql`](siga/schema.sql)
-- Tablas:
+- **Diccionario de datos:** [`docs/DICCIONARIO_DATOS.md`](docs/DICCIONARIO_DATOS.md)
+- **Diagrama E-R:** [`docs/DIAGRAMA_ER.md`](docs/DIAGRAMA_ER.md) (Mermaid, generado desde `schema.sql`)
 
 | Tabla | Propósito |
 |---|---|
 | `productos` | Catálogo de productos |
-| `tasas_historicas` | Historial de tasas de cambio/impuestos |
+| `tasas_historicas` | Historial de tasas de cambio |
 | `ventas` / `ventas_detalle` | Cabecera y líneas de cada venta |
 | `gastos_operativos` | Gastos del negocio |
-| `cierres_fiscales` | Cierres para cálculo de impuestos |
+| `cierres_fiscales` | Cierres diarios para cálculo de impuestos |
 | `lotes` | Lotes de inventario |
 | `mermas` | Pérdidas por lote |
 
-- Diagrama E-R: `docs/diagrama-er.*` (pendiente de agregar).
+## Configuración de credenciales (importante)
+
+Las credenciales **no están en el código**. Se leen desde variables de entorno:
+
+- Web: `.env` en la raíz (`VITE_ADMIN_EMAIL`, `VITE_ADMIN_PASSWORD`). Ver [`.env.example`](.env.example).
+- SIGA: `siga/.env` (`ADMIN_EMAIL`, `ADMIN_PASSWORD`, `DB_*`). Ver [`siga/.env.example`](siga/.env.example).
+
+Los archivos `.env` **no se versionan** (ver [`.gitignore`](.gitignore)).
 
 ## Instalación y ejecución
 
@@ -154,7 +96,8 @@ pip install -r requirements.txt
 # Crear las tablas
 mysql -u <usuario> -p < schema.sql
 
-# Ajustar credenciales en config.py (BD y ADMIN_PASSWORD)
+# Configurar credenciales (NO se suben al repositorio)
+cp .env.example .env            # luego editar siga/.env con los valores reales
 python app.py
 ```
 
@@ -163,8 +106,9 @@ python app.py
 Requisitos: Node.js 18 o superior y pnpm.
 
 ```bash
+cp .env.example .env            # definir VITE_ADMIN_EMAIL y VITE_ADMIN_PASSWORD
 pnpm install
-pnpm dev        # desarrollo (si no existe el script: pnpm exec vite)
+pnpm dev        # desarrollo
 pnpm build      # compilación de producción
 ```
 
@@ -180,17 +124,25 @@ cd siga
 python -m unittest discover tests     # o: pytest tests
 ```
 
-El plan completo está en [`PLAN_PRUEBAS_INVERGICA.md`](PLAN_PRUEBAS_INVERGICA.md). La checklist de aceptación está en `src/tests/fase3-aceptacion/checklist-alfa.md`.
+- Plan de pruebas: [`PLAN_PRUEBAS_INVERGICA.md`](PLAN_PRUEBAS_INVERGICA.md).
+- Checklist de aceptación: [`src/tests/fase3-aceptacion/checklist-alfa.md`](src/tests/fase3-aceptacion/checklist-alfa.md).
+- Informe de aceptación: [`docs/INFORME_ACEPTACION.md`](docs/INFORME_ACEPTACION.md).
+
+> Las pruebas unitarias cargan credenciales ficticias de prueba desde
+> `siga/tests/mock_deps.py`, por lo que la suite se ejecuta sin un `.env` real.
 
 ## Equipo
 
-| Angel | Desarrollador|
-|---|---|
-| _[Angel]_ | _[Desarrollo / Análisis / Documentación]_ |
+| Integrante | C.I. | Rol |
+|---|---|---|
+| Ángel Díaz | 31.989.203 | Desarrollo / Análisis / Documentación |
+
+> Cliente / dueño del negocio: Luis Alberto (Invergica).
 
 ## Evidencias / capturas
 
-Están en: Sistema de gestión de impuestos y ganancias/src/imports
+Diagramas (DFD, E-R), diccionarios y minutas del proyecto en `src/imports/` y en
+`docs/`. Capturas sugeridas:
 
 ```md
 ![Login](docs/img/login.png)
@@ -201,11 +153,17 @@ Están en: Sistema de gestión de impuestos y ganancias/src/imports
 
 ## Estado del proyecto
 
-En desarrollo.
+**Versión final 1.0 — entrega académica (03/10/2026).**
 
-- Hecho: login web y SIGA, punto de venta, dashboard, semáforo, sección de impuestos y suites de prueba (web 103, SIGA 77).
-- En curso: ajuste del lector de PDFs de A2 (`src/app/utils/pdfParser.ts`).
-- Pendiente: _[despliegue, DFDs y E-R en `docs/`, sincronización entre ambos sistemas]_.
+- **Hecho:** login web y SIGA (credenciales por variables de entorno), punto de
+  venta, dashboard, semáforo, sección de impuestos, esquema MySQL, diccionario
+  de datos y diagrama E-R, y suites de prueba (web 103, SIGA 77).
+- **Validado:** lógica de autenticación y cálculo fiscal (IVA 16% / IGTF 3%) por
+  pruebas unitarias; ver `docs/INFORME_ACEPTACION.md`.
+- **Pendiente de verificación manual:** casos de aceptación que requieren
+  navegador y PDFs reales de A2 (ver checklist).
+- **Mejoras futuras:** autenticación con backend (seguridad real del login web),
+  despliegue, sincronización entre SIGA y la web.
 
 ## Contacto
 
