@@ -9,8 +9,8 @@ import { describe, it, expect, beforeEach } from "vitest";
 
 // ── Lógica extraída de LoginPage (funciones puras testables) ─────────────────
 
-const ADMIN_EMAIL    = "addr43342@gmail.com";
-const ADMIN_PASSWORD = "Invergica2026";
+const ADMIN_EMAIL    = "ADMIN_EMAIL";
+const ADMIN_PASSWORD = "ADMIN_PASSWORD";
 const SESSION_KEY    = "invergica_auth";
 
 function validarEmail(email: string): boolean {
