@@ -8,6 +8,20 @@ Uso:
 
 import sys
 import types
+import os
+
+# ── Credenciales de PRUEBA por entorno ───────────────────────────────────────
+# config.py ahora lee las credenciales desde variables de entorno y aborta si
+# faltan. Para que la suite completa (77 pruebas) se ejecute sin un .env real,
+# fijamos aqui valores FICTICIOS de prueba (NUNCA las credenciales reales).
+# Se usa setdefault para no pisar un entorno ya configurado por el equipo/CI.
+os.environ.setdefault("ADMIN_EMAIL", "test.admin@invergica.local")
+os.environ.setdefault("ADMIN_PASSWORD", "TestPass2026")
+os.environ.setdefault("DB_HOST", "localhost")
+os.environ.setdefault("DB_PORT", "3306")
+os.environ.setdefault("DB_USER", "siga_test")
+os.environ.setdefault("DB_PASSWORD", "test_db_pass")
+os.environ.setdefault("DB_NAME", "siga_db")
 
 # ── helpers ────────────────────────────────────────────────────────────────
 
