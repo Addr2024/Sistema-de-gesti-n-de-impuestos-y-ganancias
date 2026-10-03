@@ -4,8 +4,8 @@ import logoImg from "../../imports/Logo.jpg";
 // ─────────────────────────────────────────────────────────────────
 // CONFIGURACIÓN DE ACCESO — Cambiar por los datos reales
 // ─────────────────────────────────────────────────────────────────
-const ADMIN_EMAIL    = "addr43342@gmail.com"; // ← Cambiar al correo real del dueño
-const ADMIN_PASSWORD = "Invergica2026";        // ← Cambiar a la contraseña real
+const ADMIN_EMAIL    = "ADMIN_EMAIL"; // ← Cambiar al correo real del dueño
+const ADMIN_PASSWORD = "ADMIN_PASSWORD";        // ← Cambiar a la contraseña real
 // ─────────────────────────────────────────────────────────────────
 
 interface LoginPageProps {
