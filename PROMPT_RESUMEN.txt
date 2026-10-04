@@ -78,8 +78,8 @@ DATOS DEL NEGOCIO:
   Dirección: Av. 13, Entre calles 67 y 67A, C.67, Maracaibo 4001, Zulia
   Google Maps: https://maps.app.goo.gl/sD1p8J5QZaA3dtvs7
   Horario: Lun–Sáb 8am–7pm / Domingo: Cerrado
-  Correo admin: addr43342@gmail.com (en LoginPage.tsx)
-  Contraseña admin: Invergica2026 (en LoginPage.tsx)
+  Correo admin: definido en .env (VITE_ADMIN_EMAIL), no en el código
+  Contraseña admin: definida en .env (VITE_ADMIN_PASSWORD), no en el código
   IVA Venezuela: 16%
   IGTF Venezuela: 3% sobre divisas
 
@@ -97,7 +97,7 @@ src/app/App.tsx
     GallerySection, DocumentsSection, ImpuestosSection, ContactSection, Footer
 
 src/app/components/LoginPage.tsx
-  - ADMIN_EMAIL y ADMIN_PASSWORD como constantes editables al inicio del archivo
+  - VITE_ADMIN_EMAIL y VITE_ADMIN_PASSWORD leídos desde variables de entorno
   - Formulario: campo email (sin placeholder, validación visual con checkmark verde),
     campo contraseña (sin placeholder, toggle mostrar/ocultar)
   - Modal "Olvidé contraseña": abre con botón WhatsApp del admin
