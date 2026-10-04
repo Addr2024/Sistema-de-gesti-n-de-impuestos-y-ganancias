@@ -1,12 +1,11 @@
 import { useState } from "react";
 import logoImg from "../../imports/Logo.jpg";
 
-// ─────────────────────────────────────────────────────────────────
-// CONFIGURACIÓN DE ACCESO — Cambiar por los datos reales
-// ─────────────────────────────────────────────────────────────────
-const ADMIN_EMAIL    = "ADMIN_EMAIL"; // ← Cambiar al correo real del dueño
-const ADMIN_PASSWORD = "ADMIN_PASSWORD";        // ← Cambiar a la contraseña real
-// ─────────────────────────────────────────────────────────────────
+// Credenciales leídas de variables de entorno (archivo .env, no versionado).
+// Nota: al ser un sitio sin servidor, Vite las incluye en el bundle; esto NO
+// sustituye una autenticación real en backend.
+const ADMIN_EMAIL    = (import.meta.env.VITE_ADMIN_EMAIL    ?? "") as string;
+const ADMIN_PASSWORD = (import.meta.env.VITE_ADMIN_PASSWORD ?? "") as string;
 
 interface LoginPageProps {
   onLogin: () => void;
@@ -33,7 +32,9 @@ export function LoginPage({ onLogin }: LoginPageProps) {
     // Simula un pequeño delay de verificación
     await new Promise(r => setTimeout(r, 700));
 
-    if (email.trim().toLowerCase() === ADMIN_EMAIL.toLowerCase() && password === ADMIN_PASSWORD) {
+    if (!ADMIN_EMAIL || !ADMIN_PASSWORD) {
+      setError("Acceso no configurado. Defina VITE_ADMIN_EMAIL y VITE_ADMIN_PASSWORD en .env.");
+    } else if (email.trim().toLowerCase() === ADMIN_EMAIL.toLowerCase() && password === ADMIN_PASSWORD) {
       localStorage.setItem("invergica_auth", "true");
       onLogin();
     } else {
