@@ -25,8 +25,8 @@ La interfaz de entrada controla el acceso total al sistema. Ninguna sección del
 #### `LoginPage.tsx`
 
 ```
-ADMIN_EMAIL    (constante)  — correo autorizado (editable por el dueño)
-ADMIN_PASSWORD (constante)  — contraseña del administrador (editable)
+VITE_ADMIN_EMAIL    (variable de entorno, .env) — correo autorizado
+VITE_ADMIN_PASSWORD (variable de entorno, .env) — contraseña del administrador
 
 handleSubmit(e)             — valida credenciales, guarda sesión en localStorage
                               clave: "invergica_auth" = "true"
