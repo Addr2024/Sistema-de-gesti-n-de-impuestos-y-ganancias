@@ -22,8 +22,8 @@ MySQL Connector). Se añadieron 5 archivos nuevos y se modificaron 3 existentes.
 **Cambios:** Añadidas 4 constantes nuevas en la sección de configuración:
 
 ```python
-ADMIN_EMAIL    = "addr43342@gmail.com"   # Módulo A: credencial admin
-ADMIN_PASSWORD = "Invergica2026"          # Módulo A: contraseña admin
+ADMIN_EMAIL    = _requerido("ADMIN_EMAIL")      # Módulo A: leído de siga/.env
+ADMIN_PASSWORD = _requerido("ADMIN_PASSWORD")   # Módulo A: leído de siga/.env
 IVA_RATE       = 0.16                    # Proceso 2.2.2 DFD — 16%
 IGTF_RATE      = 0.03                    # Proceso 2.2.3 DFD — 3%
 LOTE_ROJO_DIAS     = 0                   # DFD 3.3.3: vencido o vence hoy
@@ -195,8 +195,8 @@ mysql -u root -p < siga/schema.sql
 cd siga
 python3 app.py
 ```
-Al iniciar aparece la pantalla de login. Las credenciales son las configuradas
-en `config.py` (`ADMIN_EMAIL` / `ADMIN_PASSWORD`).
+Al iniciar aparece la pantalla de login. Las credenciales se leen de `siga/.env` (plantilla: `siga/.env.example`):
+variables `ADMIN_EMAIL`, `ADMIN_PASSWORD` y `DB_PASSWORD`.
 
 ### Ejecutar las pruebas
 ```bash
@@ -261,4 +261,3 @@ test_login.TestCalcularIVA              —  6/ 6 ✅
 test_login.TestColorSemaforoLote        —  8/ 8 ✅
 test_login.TestValidarEmail             — 10/10 ✅
 test_login.TestVerificarCredenciales    — 10/10 ✅
-```
