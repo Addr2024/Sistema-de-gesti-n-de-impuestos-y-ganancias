@@ -5,6 +5,11 @@
 // ─────────────────────────────────────────────────────────────────────────────
 
 import * as pdfjsLib from 'pdfjs-dist';
+// Worker empaquetado localmente por Vite (NO desde CDN).
+// El sufijo `?url` hace que Vite copie el worker al build y devuelva su URL
+// con hash, por lo que funciona offline y desde una clonación limpia, sin
+// depender de Internet ni de que la versión del CDN coincida con la API.
+import pdfWorkerUrl from 'pdfjs-dist/build/pdf.worker.min.mjs?url';
 
 // ╔══════════════════════════════════════════════════════════════════════════════╗
 // ║  1. ARRANQUE GLOBAL Y CONFIGURACIÓN DEL WORKER                           ║
@@ -20,15 +25,17 @@ if (typeof window !== 'undefined') {
 }
 
 /**
- * Configuración del Worker con versión alineada dinámicamente.
+ * Configuración del Worker de pdf.js.
  *
- * – Se lee `pdfjsLib.version` en tiempo de ejecución para garantizar que
- *   la versión del Worker CDN coincida exactamente con la API importada.
- * – El fallback `6.1.200` corresponde a la versión_pin en package.json.
+ * Se usa el worker empaquetado por Vite (import con sufijo `?url`), de modo
+ * que viaje dentro del build y la versión del worker coincida siempre con la
+ * API importada, sin depender de un CDN externo.
  */
-const PDFJS_VERSION = pdfjsLib.version || '6.1.200';
-pdfjsLib.GlobalWorkerOptions.workerSrc =
-  `https://cdnjs.cloudflare.com/ajax/libs/pdf.js/${PDFJS_VERSION}/pdf.worker.min.mjs`;
+// FIX: usar el worker empaquetado localmente (import `?url`) en lugar del CDN.
+// El worker CDN fallaba en clonación limpia / sin conexión y bloqueaba la
+// lectura de cualquier PDF. Con el worker local la carga es determinista y la
+// versión del worker siempre coincide con la API importada.
+pdfjsLib.GlobalWorkerOptions.workerSrc = pdfWorkerUrl;
 
 // ╔══════════════════════════════════════════════════════════════════════════════╗
 // ║  2. INTERFACES EXPORTADAS                                                ║
@@ -161,10 +168,30 @@ export async function extractTextFromPdf(file: File): Promise<string> {
     for (let i = 1; i <= pdf.numPages; i++) {
       const page = await pdf.getPage(i);
       const textContent = await page.getTextContent();
-      const pageText = textContent.items
-        .map((item: any) => item.str)
-        .join(' ');
-      fullText += pageText + '\n';
+
+      // FIX: reconstruir una línea por fila usando la coordenada Y (tol. 3px).
+      // Antes se unia TODA la página con ' ' y solo se agregaba un '\n' por
+      // página, por lo que los parsers que dividen por '\n' (ventas fiscales,
+      // lotes/vencimientos) recibian la página entera como una sola línea y no
+      // detectaban ninguna fila.
+      const lineItems = (textContent.items as any[])
+        .filter(it => 'str' in it && it.str.trim())
+        .map(it => ({ str: it.str.trim(), x: it.transform[4], y: it.transform[5] }))
+        .sort((a, b) => b.y - a.y || a.x - b.x);
+
+      let refY: number | null = null;
+      let linea: string[] = [];
+      for (const it of lineItems) {
+        if (refY === null || Math.abs(it.y - refY) <= 3) {
+          linea.push(it.str);
+          refY = refY === null ? it.y : refY;
+        } else {
+          fullText += linea.join(' ') + '\n';
+          linea = [it.str];
+          refY = it.y;
+        }
+      }
+      if (linea.length) fullText += linea.join(' ') + '\n';
     }
 
     return fullText;
@@ -475,4 +502,3 @@ export function resumenFiscal(rows: VentaRow[], tasaIva = 16, tasaIgtf = 3) {
     cantidadRegistros:   rows.length,
   };
 }
-
