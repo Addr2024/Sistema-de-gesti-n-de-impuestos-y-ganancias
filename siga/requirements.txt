@@ -1,8 +1,16 @@
-# SIGA — Dependencias Python
+# ===== Dependencias del backend Python de SIGA =====
 # Instalar con:  pip install -r requirements.txt
 
-customtkinter>=5.2.2
-mysql-connector-python>=8.3.0
-pandas>=2.2.0
-matplotlib>=3.8.0
-numpy>=1.26.0
+# Carga de variables de entorno desde el archivo .env (requerido por config.py)
+python-dotenv>=1.0.0
+
+# Interfaz grafica
+customtkinter>=5.2.0
+
+# Datos y calculo
+pandas>=2.0.0
+numpy>=1.24.0
+matplotlib>=3.7.0
+
+# Conector MySQL
+mysql-connector-python>=8.0.33
