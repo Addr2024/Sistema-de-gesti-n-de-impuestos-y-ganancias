@@ -1,0 +1,91 @@
+================================================================================
+PROMPT — FASE 4: MANTENIMIENTO EVOLUTIVO — PREPARAR PRÓXIMO INCREMENTO
+Aplica cuando: se detectó un fallo, cambió el entorno, o se va a añadir un módulo
+================================================================================
+
+CONTEXTO:
+Eres un desarrollador que va a realizar mantenimiento del sistema Invergica Web
+después de completar un ciclo de pruebas alfa/beta.
+El sistema está en: React 18 + TypeScript + Tailwind CSS v4 (Figma Make / Vite).
+Tests corren con: pnpm vitest run (103 tests actualmente)
+
+════════════════════════════════════════════════════════════════════════════════
+MANTENIMIENTO CORRECTIVO (40%) — Si se encontró un fallo en Alfa/Beta
+════════════════════════════════════════════════════════════════════════════════
+
+PROCESO:
+  1. Identifica el archivo afectado según la sección del fallo:
+     - Login → src/app/components/LoginPage.tsx
+     - PDF parse → src/app/utils/pdfParser.ts
+     - Impuestos → src/app/utils/taxStorage.ts + src/app/components/ImpuestosSection.tsx
+     - Inventario → src/app/components/InventarioPanel.tsx
+
+  2. Reproduce el fallo con un test nuevo en la carpeta correspondiente:
+     src/tests/fase1-unitarias/ → fallo en lógica pura
+     src/tests/fase2-integracion/ → fallo en comunicación entre módulos
+
+  3. Aplica la corrección mínima que hace pasar el test.
+
+  4. Ejecuta pnpm vitest run para confirmar que no se rompieron otros tests.
+
+  5. Documenta la corrección en los comentarios del código.
+
+════════════════════════════════════════════════════════════════════════════════
+MANTENIMIENTO PERFECTIVO (20%) — Optimizar rendimiento o UX
+════════════════════════════════════════════════════════════════════════════════
+
+MEJORAS IDENTIFICADAS PARA EL PRÓXIMO INCREMENTO:
+
+A) Exportar reporte fiscal a PDF desde el navegador
+   - Instalar: pnpm add html2pdf.js
+   - Agregar botón "Exportar para SENIAT" en ImpuestosSection.tsx
+   - Captura el div del resumen fiscal y lo convierte a PDF
+   - Test: verificar que el botón existe en el DOM (React Testing Library)
+
+B) Historial de declaraciones pasadas
+   - Agregar en taxStorage.ts: marcarMesDeclarado(mes: string)
+   - Agregar interfaz visual en ImpuestosSection.tsx
+   - Test unitario: marcarMesDeclarado y leerDeclaracionesPasadas
+
+C) Semáforo de vencimiento de lotes (DFD 3.1)
+   - Agregar en pdfParser.ts: parseVencimientosLotes()
+   - Agregar en InventarioPanel.tsx: tabla de lotes próximos a vencer
+   - Test: colorAlertaLote ya probado en fase2-integracion/semaforoInventario
+
+════════════════════════════════════════════════════════════════════════════════
+MANTENIMIENTO ADAPTATIVO (30%) — Cambios en el entorno
+════════════════════════════════════════════════════════════════════════════════
+
+SI CAMBIA LA TASA DE IVA (actualmente 16%):
+  - Editar src/app/utils/taxStorage.ts línea: export const IVA_RATE = 0.16;
+  - El test "IVA_RATE debe ser exactamente 0.16" fallará → actualiza el test
+  - Comando: pnpm vitest run src/tests/fase1-unitarias/taxStorage.unit.test.ts
+
+SI CAMBIA LA TASA DE IGTF (actualmente 3%):
+  - Editar src/app/utils/taxStorage.ts línea: export const IGTF_RATE = 0.03;
+  - El test "IGTF_RATE debe ser exactamente 0.03" fallará → actualiza el test
+
+SI EL SISTEMA A2 CAMBIA EL FORMATO DEL PDF:
+  - Revisar parseVentasRows() en src/app/utils/pdfParser.ts
+  - El cambio estará en el número de columnas (actualmente mínimo 6 numéricas)
+  - Ajustar: if (nums.length < 6) continue;
+  - Agregar test de integración con el nuevo formato de PDF mockado
+
+SI CAMBIA EL CORREO O CONTRASEÑA DEL ADMINISTRADOR:
+  - Editar el archivo .env (no versionado) de la raíz:
+    VITE_ADMIN_EMAIL=<nuevo correo>
+    VITE_ADMIN_PASSWORD=<nueva contraseña>
+  - Para SIGA, editar siga/.env (ADMIN_EMAIL, ADMIN_PASSWORD)
+  - Las pruebas usan credenciales ficticias propias; no requieren cambios
+
+════════════════════════════════════════════════════════════════════════════════
+VERIFICACIÓN POST-MANTENIMIENTO
+════════════════════════════════════════════════════════════════════════════════
+
+Ejecutar siempre después de cualquier cambio:
+  pnpm vitest run
+
+Resultado esperado: "Test Files X passed" sin fallos.
+Si hay fallos: analizar el mensaje de error y corregir antes de entregar.
+
+================================================================================

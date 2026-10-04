@@ -1,0 +1,63 @@
+================================================================================
+PROMPT — FASE 3: PRUEBAS DE ACEPTACIÓN ALFA (MANUAL)
+Documento: src/tests/fase3-aceptacion/checklist-alfa.md
+Ejecutar: Manualmente con el dueño del abasto supervisado por el desarrollador
+================================================================================
+
+CONTEXTO:
+Eres el administrador de Invergica guiado por el desarrollador.
+Esta es una prueba de aceptación alfa que valida la usabilidad del sistema
+desde la perspectiva del usuario real del abasto.
+Duración estimada: 45–60 minutos con un PDF de ventas real del sistema A2.
+
+PREPARACIÓN ANTES DE EMPEZAR:
+  1. Tener abierto el sistema A2 para exportar un PDF de hoy
+  2. Tener el navegador Chrome o Firefox actualizado
+  3. Abrir las herramientas de desarrollador (F12) para probar responsive
+  4. Tener el número de WhatsApp disponible para verificar el botón
+
+MÓDULO A — AUTENTICACIÓN (25 min):
+  A01: ¿El login acepta tus credenciales correctas?
+  A02: ¿Aparece mensaje de error con contraseña incorrecta?
+  A03: ¿Al cerrar y reabrir el navegador sigue la sesión activa?
+  A04: ¿El botón "Salir" en la barra superior cierra la sesión?
+  A05: ¿"¿Olvidaste tu contraseña?" abre modal con botón WhatsApp?
+  A06: ¿"¿No tienes una cuenta?" muestra mensaje de sistema privado?
+
+MÓDULO B — REPORTE DE VENTAS (10 min):
+  B01: Arrastra el PDF de ventas del día al recuadro naranja. ¿Carga los datos?
+  B02: ¿El semáforo circular muestra un color acorde al rendimiento?
+  B03: ¿La gráfica de barras muestra los productos? ¿El tooltip funciona?
+  B04: ¿Aparece el badge verde "Datos guardados para Pago de Impuestos"?
+  B05: Carga un PDF que no sea de ventas. ¿Muestra error claro?
+
+MÓDULO C — INVENTARIO (5 min):
+  C01: Carga el PDF de inventario. ¿Aparecen los contadores?
+  C02: Sin cargar PDF, ¿el semáforo está apagado (oscuro)?
+  C03: ¿Los productos agotados/bajos aparecen en rojo/amarillo?
+
+MÓDULO D — PAGO DE IMPUESTOS (10 min):
+  D01: Después de cargar el PDF de ventas, ¿la sección Impuestos muestra datos?
+  D02: Verifica: IVA en pantalla = Base Imponible × 0.16 ¿Es correcto?
+  D03: En la tabla, haz clic en la columna "Divisas" de hoy. ¿Se puede editar?
+       Escribe 100. ¿El IGTF cambia a 3.00?
+  D04: ¿El badge muestra los días para el vencimiento (día 15 del mes próximo)?
+  D05: Cambia el selector de mes. ¿Cambian los datos?
+  D06: Selecciona un mes sin datos. ¿Aparece el mensaje explicativo?
+
+MÓDULO E — USABILIDAD (5 min):
+  E01: Haz clic en los enlaces del menú. ¿Hace scroll suave a cada sección?
+  E02: En F12 → modo dispositivo móvil. ¿El diseño se adapta?
+  E03: Haz clic en el botón verde WhatsApp. ¿Abre el chat correcto?
+  E04: Haz clic en "Ver en Google Maps". ¿Abre la ubicación de Invergica?
+  E05: Carga el PDF de ventas. ¿El resultado aparece en menos de 10 segundos?
+
+CRITERIOS DE APROBACIÓN:
+  - BLOQUEANTE: Módulo A, B01-B04, D01-D03 deben pasar al 100%
+  - NO BLOQUEANTE: Módulo E puede tener observaciones menores
+
+REPORTAR FALLO:
+  Documenta: [módulo] + [pasos exactos] + [qué ocurrió] + [qué se esperaba]
+  Enviar al desarrollador por WhatsApp con captura de pantalla.
+
+================================================================================
