@@ -1,62 +1,49 @@
 # ============================================================
 # SIGA - Configuración central
 # ============================================================
-#
-# Las credenciales (BD y administrador) NO van en el código.
-# Se leen desde variables de entorno / archivo .env (ver siga/.env.example).
-# Este archivo SÍ se versiona; el archivo .env NO (ver .gitignore).
-# ============================================================
 
+# --- Carga de configuración segura (archivo .env / variables de entorno) ---
 import os
+from pathlib import Path
 
-# Carga opcional de un archivo .env (si python-dotenv está instalado).
-# Si no está, se usan las variables de entorno del sistema igualmente.
-try:
-    from dotenv import load_dotenv
-    load_dotenv()  # busca un .env en el directorio de trabajo / siga/
-except ImportError:
-    pass
+from dotenv import load_dotenv
+
+# No sobrescribe variables ya definidas en el entorno del sistema
+load_dotenv(Path(__file__).resolve().parent / ".env")
 
 
-def _env(nombre, por_defecto=None):
-    """Lee una variable de entorno; usa un valor por defecto si no existe."""
-    return os.getenv(nombre, por_defecto)
+def _requerido(nombre: str) -> str:
+    valor = os.getenv(nombre, "").strip()
+    if not valor:
+        raise RuntimeError(
+            f"Falta la variable de entorno {nombre}. "
+            "Copie siga/.env.example a siga/.env y complete los valores."
+        )
+    return valor
 
 
-def _env_int(nombre, por_defecto):
-    """Lee una variable de entorno numérica de forma segura."""
-    valor = os.getenv(nombre)
+def _entero(nombre: str, defecto: int) -> int:
     try:
-        return int(valor) if valor not in (None, "") else por_defecto
-    except (TypeError, ValueError):
-        return por_defecto
+        return int(os.getenv(nombre, str(defecto)))
+    except ValueError:
+        return defecto
 
 
-# --- Base de datos (valores reales en siga/.env) ---
+# --- Base de datos ---
 DB_CONFIG = {
-    "host":            _env("DB_HOST", "localhost"),
-    "port":            _env_int("DB_PORT", 3306),
-    "user":            _env("DB_USER", "root"),
-    "password":        _env("DB_PASSWORD", ""),
-    "database":        _env("DB_NAME", "siga_db"),
-    "charset":         "utf8mb4",
-    "autocommit":      False,
+    "host":     os.getenv("DB_HOST", "localhost"),
+    "port":     _entero("DB_PORT", 3306),
+    "user":     os.getenv("DB_USER", "root"),
+    "password": _requerido("DB_PASSWORD"),
+    "database": os.getenv("DB_NAME", "siga_db"),
+    "charset":  "utf8mb4",
+    "autocommit": False,
     "connect_timeout": 5,
 }
 
 # --- Credenciales del administrador (Módulo A: Autenticación) ---
-# Se definen en siga/.env como ADMIN_EMAIL y ADMIN_PASSWORD.
-ADMIN_EMAIL    = _env("ADMIN_EMAIL", "")
-ADMIN_PASSWORD = _env("ADMIN_PASSWORD", "")
-
-# Aviso temprano si faltan credenciales de administrador (no detiene la app).
-if not ADMIN_EMAIL or not ADMIN_PASSWORD:
-    import warnings
-    warnings.warn(
-        "ADMIN_EMAIL / ADMIN_PASSWORD no estan definidos. "
-        "Copia siga/.env.example a siga/.env y completa los valores.",
-        RuntimeWarning,
-    )
+ADMIN_EMAIL    = _requerido("ADMIN_EMAIL")
+ADMIN_PASSWORD = _requerido("ADMIN_PASSWORD")
 
 # --- Parámetros fiscales ---
 IVA_RATE     = 0.16   # 16 %
